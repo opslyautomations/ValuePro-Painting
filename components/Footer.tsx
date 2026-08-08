@@ -65,8 +65,8 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/reviews" className="hover:text-brand-green-light">
-                Reviews
+              <Link href="/paint-colors" className="hover:text-brand-green-light">
+                Paint Colors
               </Link>
             </li>
             <li>

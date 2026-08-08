@@ -10,6 +10,7 @@ import CTABand from "@/components/CTABand";
 import JsonLd from "@/components/JsonLd";
 import { pageMetadata } from "@/lib/seo";
 import { homepageLocalBusinessSchema } from "@/lib/schema";
+import { BUSINESS } from "@/lib/constants";
 
 export const metadata: Metadata = pageMetadata({
   title: "Painters in St. Louis County | ValuePro Painting",
@@ -92,15 +93,27 @@ export default function Home() {
           <h2 className="font-heading text-2xl sm:text-3xl font-semibold text-brand-teal-dark mb-8">
             What Homeowners Say
           </h2>
-          <div className="grid sm:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ReviewCard text="[SAMPLE — REPLACE BEFORE LAUNCH: real GBP review]" />
+            <ReviewCard text="[SAMPLE — REPLACE BEFORE LAUNCH: real GBP review]" />
+            <ReviewCard text="[SAMPLE — REPLACE BEFORE LAUNCH: real GBP review]" />
             <ReviewCard text="[SAMPLE — REPLACE BEFORE LAUNCH: real GBP review]" />
             <ReviewCard text="[SAMPLE — REPLACE BEFORE LAUNCH: real GBP review]" />
             <ReviewCard text="[SAMPLE — REPLACE BEFORE LAUNCH: real GBP review]" />
           </div>
-          <div className="mt-6">
-            <Link href="/reviews" className="text-brand-teal font-semibold hover:underline">
-              Read more reviews →
-            </Link>
+          <p className="mt-4 text-sm text-ink-muted">
+            The reviews above are placeholders while we collect real feedback
+            from ValuePro Painting customers.
+          </p>
+          <div className="mt-4">
+            <a
+              href={BUSINESS.gbpUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-teal font-semibold hover:underline"
+            >
+              See our verified reviews on Google →
+            </a>
           </div>
         </div>
       </section>

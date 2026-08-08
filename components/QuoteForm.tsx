@@ -6,7 +6,13 @@ import { CITIES, SERVICES } from "@/lib/constants";
 
 type Errors = Partial<Record<"name" | "phone" | "email" | "service" | "city", string>>;
 
-export default function QuoteForm({ compact = false }: { compact?: boolean }) {
+export default function QuoteForm({
+  compact = false,
+  defaultMessage,
+}: {
+  compact?: boolean;
+  defaultMessage?: string;
+}) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
@@ -221,6 +227,7 @@ export default function QuoteForm({ compact = false }: { compact?: boolean }) {
           id="message"
           name="message"
           rows={3}
+          defaultValue={defaultMessage}
           className="w-full rounded-md border border-black/15 px-3 py-2 text-ink bg-white focus:outline-none focus:ring-2 focus:ring-brand-teal"
         />
       </div>

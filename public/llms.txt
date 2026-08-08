@@ -30,7 +30,7 @@
 
 ## Company
 - [About](https://valuepropainting.com/about): Owner Ryan's background in home services and how it shapes the painting work.
-- [Reviews](https://valuepropainting.com/reviews): Customer feedback.
+- [Paint Colors](https://valuepropainting.com/paint-colors): Browseable Sherwin-Williams and Benjamin Moore color reference for St. Louis County homes, with contractor notes and a free color consultation CTA. Customer reviews now live on the homepage.
 - [Gallery](https://valuepropainting.com/gallery): Completed project photos.
 - [Contact](https://valuepropainting.com/contact): Free estimate requests.
 

@@ -30,10 +30,6 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-6 font-medium text-ink">
-          <Link href="/" className="hover:text-brand-teal">
-            Home
-          </Link>
-
           <div
             className="relative"
             onMouseEnter={() => setServicesOpen(true)}
@@ -99,8 +95,8 @@ export default function Header() {
           <Link href="/about" className="hover:text-brand-teal">
             About
           </Link>
-          <Link href="/reviews" className="hover:text-brand-teal">
-            Reviews
+          <Link href="/paint-colors" className="hover:text-brand-teal">
+            Paint Colors
           </Link>
           <Link href="/gallery" className="hover:text-brand-teal">
             Gallery
@@ -164,15 +160,7 @@ export default function Header() {
             </button>
           </div>
           <nav className="flex flex-col p-4 gap-1 text-lg">
-            <Link
-              href="/"
-              className="tap-target flex items-center py-2"
-              onClick={() => setMobileOpen(false)}
-            >
-              Home
-            </Link>
-
-            <p className="pt-3 pb-1 text-sm font-semibold uppercase text-ink-muted">
+            <p className="pt-1 pb-1 text-sm font-semibold uppercase text-ink-muted">
               Services
             </p>
             {SERVICES.map((s) => (
@@ -223,11 +211,11 @@ export default function Header() {
               About
             </Link>
             <Link
-              href="/reviews"
+              href="/paint-colors"
               className="tap-target flex items-center py-2"
               onClick={() => setMobileOpen(false)}
             >
-              Reviews
+              Paint Colors
             </Link>
             <Link
               href="/gallery"

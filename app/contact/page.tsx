@@ -18,7 +18,13 @@ const breadcrumbs = [
   { name: "Contact", path: "/contact" },
 ];
 
-export default function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ message?: string }>;
+}) {
+  const { message } = await searchParams;
+
   return (
     <>
       <JsonLd data={breadcrumbSchema(breadcrumbs)} />
@@ -69,7 +75,7 @@ export default function ContactPage() {
         </div>
 
         <div className="flex justify-center lg:justify-end">
-          <QuoteForm />
+          <QuoteForm defaultMessage={message} />
         </div>
       </section>
     </>
