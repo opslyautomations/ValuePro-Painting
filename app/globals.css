@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --brand-teal: #1f6f78;
+  --brand-teal-dark: #145057;
+  --brand-green: #a8c686;
+  --brand-green-light: #d6e4c4;
+  --brand-offwhite: #f7f5f0;
+  --ink: #1c1f1e;
+  --ink-muted: #5a625f;
+}
+
+@theme inline {
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-teal-dark: var(--brand-teal-dark);
+  --color-brand-green: var(--brand-green);
+  --color-brand-green-light: var(--brand-green-light);
+  --color-brand-offwhite: var(--brand-offwhite);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --font-heading: var(--font-fraunces);
+  --font-sans: var(--font-source-sans);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--brand-offwhite);
+  color: var(--ink);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading), Georgia, serif;
+}
+
+/* Reserve sticky header height to avoid layout shift */
+:root {
+  --header-height: 80px;
+}
+
+.tap-target {
+  min-height: 48px;
+  min-width: 48px;
+}
