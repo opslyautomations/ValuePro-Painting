@@ -87,31 +87,33 @@ export default function ColorRail({
         </div>
       </div>
 
-      <div
-        ref={scrollRef}
-        onKeyDown={handleKeyDown}
-        className="flex gap-3 overflow-x-auto px-4 sm:px-6 pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {colors.map((color, i) => {
-          const lazyStyle: CSSProperties = lazy
-            ? { contentVisibility: "auto", containIntrinsicSize: "160px 180px" }
-            : {};
-          return (
-            <div key={color.id} style={lazyStyle}>
-              <ColorCard
-                color={color}
-                isComparing={compareIds.includes(color.id)}
-                compareDisabled={compareFull && !compareIds.includes(color.id)}
-                onToggleCompare={onToggleCompare}
-                onOpenDetail={onOpenDetail}
-                tabIndex={i === activeIndex ? 0 : -1}
-                cardRef={(el) => {
-                  cardEls.current[i] = el;
-                }}
-              />
-            </div>
-          );
-        })}
+      <div className="mx-auto max-w-7xl">
+        <div
+          ref={scrollRef}
+          onKeyDown={handleKeyDown}
+          className="flex gap-3 overflow-x-auto px-4 sm:px-6 pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {colors.map((color, i) => {
+            const lazyStyle: CSSProperties = lazy
+              ? { contentVisibility: "auto", containIntrinsicSize: "160px 180px" }
+              : {};
+            return (
+              <div key={color.id} style={lazyStyle}>
+                <ColorCard
+                  color={color}
+                  isComparing={compareIds.includes(color.id)}
+                  compareDisabled={compareFull && !compareIds.includes(color.id)}
+                  onToggleCompare={onToggleCompare}
+                  onOpenDetail={onOpenDetail}
+                  tabIndex={i === activeIndex ? 0 : -1}
+                  cardRef={(el) => {
+                    cardEls.current[i] = el;
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
