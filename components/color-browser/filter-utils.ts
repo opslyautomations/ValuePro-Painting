@@ -65,7 +65,6 @@ export const USE_CASES: { value: UseCase; label: string }[] = [
 ];
 
 export type Filters = {
-  q: string;
   brands: Brand[];
   families: Family[];
   useCases: UseCase[];
@@ -74,7 +73,6 @@ export type Filters = {
 };
 
 export const DEFAULT_FILTERS: Filters = {
-  q: "",
   brands: [],
   families: [],
   useCases: [],
@@ -84,7 +82,6 @@ export const DEFAULT_FILTERS: Filters = {
 
 export function filtersEqual(a: Filters, b: Filters): boolean {
   return (
-    a.q === b.q &&
     a.lrvMin === b.lrvMin &&
     a.lrvMax === b.lrvMax &&
     a.brands.length === b.brands.length &&
@@ -97,8 +94,6 @@ export function filtersEqual(a: Filters, b: Filters): boolean {
 }
 
 export function filtersFromSearchParams(sp: URLSearchParams): Filters {
-  const q = sp.get("q") ?? "";
-
   const brands = (sp.get("brand") ?? "")
     .split(",")
     .filter(Boolean)
@@ -133,12 +128,11 @@ export function filtersFromSearchParams(sp: URLSearchParams): Filters {
     }
   }
 
-  return { q, brands, families, useCases, lrvMin, lrvMax };
+  return { brands, families, useCases, lrvMin, lrvMax };
 }
 
 export function filtersToSearchParams(filters: Filters): URLSearchParams {
   const sp = new URLSearchParams();
-  if (filters.q) sp.set("q", filters.q);
   if (filters.brands.length) {
     sp.set("brand", filters.brands.map((b) => BRAND_CODES[b]).join(","));
   }
@@ -158,21 +152,7 @@ function clamp(n: number, min: number, max: number): number {
   return Math.min(Math.max(n, min), max);
 }
 
-function normalizeForSearch(s: string): string {
-  return s.toLowerCase().replace(/[\s-]/g, "");
-}
-
-export function matchesSearch(color: PaintColor, rawQuery: string): boolean {
-  const query = rawQuery.trim().toLowerCase();
-  if (!query) return true;
-  if (color.name.toLowerCase().includes(query)) return true;
-  const normalizedQuery = normalizeForSearch(query);
-  const normalizedCode = normalizeForSearch(color.code);
-  return normalizedCode.includes(normalizedQuery);
-}
-
 export function matchesFilters(color: PaintColor, filters: Filters): boolean {
-  if (!matchesSearch(color, filters.q)) return false;
   if (filters.brands.length && !filters.brands.includes(color.brand)) return false;
   if (filters.families.length && !filters.families.includes(color.family)) return false;
   if (

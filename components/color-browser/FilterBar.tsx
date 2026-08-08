@@ -31,27 +31,37 @@ export default function FilterBar({
   onViewChange: (view: "rails" | "grid") => void;
   jumpFamilies: Family[];
 }) {
-  const [searchInput, setSearchInput] = useState(filters.q);
-  const [syncedQ, setSyncedQ] = useState(filters.q);
+  // Always starts expanded to match server-rendered HTML exactly — reading
+  // window.scrollY into the initial state would mismatch during hydration
+  // if the page loads already scrolled (e.g. an anchor link).
+  const [collapsed, setCollapsed] = useState(false);
 
-  // Keep the input in sync if filters.q changes externally (Clear all
-  // button, back/forward navigation) — adjusted during render rather than
-  // in an effect, per React's "adjusting state on prop change" pattern.
-  if (filters.q !== syncedQ) {
-    setSyncedQ(filters.q);
-    setSearchInput(filters.q);
-  }
-
+  // Auto-collapse the chip/slider panel on any scroll movement so the color
+  // rails stay visible — never auto-expands, so a manual re-open sticks
+  // until the visitor scrolls again.
   useEffect(() => {
-    const handle = setTimeout(() => {
-      if (searchInput !== filters.q) {
-        onChange({ ...filters, q: searchInput });
-      }
-    }, 300);
-    return () => clearTimeout(handle);
-    // filters intentionally excluded — only the debounced search text drives this effect
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchInput]);
+    let lastY = window.scrollY;
+    let ticking = false;
+    function check() {
+      const y = window.scrollY;
+      if (Math.abs(y - lastY) > 8) setCollapsed(true);
+      lastY = y;
+      ticking = false;
+    }
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(check);
+    }
+    // Deferred to a rAF (post-hydration) rather than checked synchronously
+    // here, so a page that loads already scrolled (e.g. an anchor link)
+    // still collapses once mounted, without touching the hydration render.
+    requestAnimationFrame(() => {
+      if (window.scrollY > 8) setCollapsed(true);
+    });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   function toggleBrand(brand: Brand) {
     const next = filters.brands.includes(brand)
@@ -75,7 +85,6 @@ export default function FilterBar({
   }
 
   function clearAll() {
-    setSearchInput("");
     onChange(DEFAULT_FILTERS);
   }
 
@@ -87,20 +96,19 @@ export default function FilterBar({
       style={{ top: "var(--header-height)" }}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 space-y-3">
-        <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-          <div className="relative flex-1 max-w-sm">
-            <label htmlFor="paint-color-search" className="sr-only">
-              Search colors by name or code
-            </label>
-            <input
-              id="paint-color-search"
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search name or code (e.g. SW 7008)"
-              className="tap-target w-full rounded-md border border-black/15 bg-white px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand-teal"
-            />
-          </div>
+        <div className="flex flex-wrap gap-3 items-center">
+          <button
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            aria-expanded={!collapsed}
+            aria-controls="paint-filter-panel"
+            className="tap-target inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-3 text-sm font-semibold text-ink hover:bg-brand-green-light/40 shrink-0"
+          >
+            <span aria-hidden className={`inline-block transition-transform ${collapsed ? "" : "rotate-90"}`}>
+              ›
+            </span>
+            Filters
+          </button>
 
           <div
             className="flex items-center gap-1 rounded-md border border-black/15 bg-white p-1 shrink-0"
@@ -136,115 +144,119 @@ export default function FilterBar({
           >
             Clear all
           </button>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold uppercase text-ink-muted mr-1">Brand</span>
-          <button
-            type="button"
-            role="checkbox"
-            aria-checked={allBrandsActive}
-            onClick={() => onChange({ ...filters, brands: [] })}
-            className={chipClass(allBrandsActive)}
-          >
-            All
-          </button>
-          {BRANDS.map((brand) => (
-            <button
-              key={brand}
-              type="button"
-              role="checkbox"
-              aria-checked={filters.brands.includes(brand)}
-              onClick={() => toggleBrand(brand)}
-              className={chipClass(filters.brands.includes(brand))}
-            >
-              {BRAND_LABELS[brand]}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold uppercase text-ink-muted mr-1">Family</span>
-          {FAMILIES.map((family) => (
-            <button
-              key={family}
-              type="button"
-              role="checkbox"
-              aria-checked={filters.families.includes(family)}
-              onClick={() => toggleFamily(family)}
-              className={chipClass(filters.families.includes(family))}
-            >
-              {family}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold uppercase text-ink-muted mr-1">Use</span>
-          {USE_CASES.map((uc) => (
-            <button
-              key={uc.value}
-              type="button"
-              role="checkbox"
-              aria-checked={filters.useCases.includes(uc.value)}
-              onClick={() => toggleUseCase(uc.value)}
-              className={chipClass(filters.useCases.includes(uc.value))}
-            >
-              {uc.label}
-            </button>
-          ))}
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-xs font-semibold uppercase text-ink-muted">
-              LRV: Light ← → Dark
-            </label>
-            <span className="text-xs font-medium text-ink">
-              {filters.lrvMin}–{filters.lrvMax}
-            </span>
-          </div>
-          <div className="relative h-6 flex items-center">
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={filters.lrvMin}
-              aria-label="Minimum LRV"
-              onChange={(e) =>
-                onChange({ ...filters, lrvMin: Math.min(Number(e.target.value), filters.lrvMax) })
-              }
-              className="dual-range absolute w-full"
-            />
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={filters.lrvMax}
-              aria-label="Maximum LRV"
-              onChange={(e) =>
-                onChange({ ...filters, lrvMax: Math.max(Number(e.target.value), filters.lrvMin) })
-              }
-              className="dual-range absolute w-full"
-            />
-          </div>
-          <p className="text-xs text-ink-muted mt-1">
-            LRV (Light Reflectance Value) measures how much light a color reflects back — 0 is absolute black, 100 is pure white.
+          <p aria-live="polite" className="text-sm font-medium text-ink shrink-0">
+            Showing {resultCount} of {totalCount} colors.
           </p>
         </div>
 
-        <p aria-live="polite" className="text-sm font-medium text-ink">
-          Showing {resultCount} of {totalCount} colors.
-        </p>
+        {!collapsed && (
+          <div id="paint-filter-panel" className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase text-ink-muted mr-1">Brand</span>
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={allBrandsActive}
+                onClick={() => onChange({ ...filters, brands: [] })}
+                className={chipClass(allBrandsActive)}
+              >
+                All
+              </button>
+              {BRANDS.map((brand) => (
+                <button
+                  key={brand}
+                  type="button"
+                  role="checkbox"
+                  aria-checked={filters.brands.includes(brand)}
+                  onClick={() => toggleBrand(brand)}
+                  className={chipClass(filters.brands.includes(brand))}
+                >
+                  {BRAND_LABELS[brand]}
+                </button>
+              ))}
+            </div>
 
-        {jumpFamilies.length > 0 && (
-          <nav aria-label="Jump to color family" className="flex flex-wrap gap-x-3 gap-y-1 text-xs pt-1">
-            {jumpFamilies.map((family) => (
-              <a key={family} href={`#${FAMILY_CODES[family]}`} className="text-brand-teal hover:underline">
-                {family}
-              </a>
-            ))}
-          </nav>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase text-ink-muted mr-1">Family</span>
+              {FAMILIES.map((family) => (
+                <button
+                  key={family}
+                  type="button"
+                  role="checkbox"
+                  aria-checked={filters.families.includes(family)}
+                  onClick={() => toggleFamily(family)}
+                  className={chipClass(filters.families.includes(family))}
+                >
+                  {family}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase text-ink-muted mr-1">Use</span>
+              {USE_CASES.map((uc) => (
+                <button
+                  key={uc.value}
+                  type="button"
+                  role="checkbox"
+                  aria-checked={filters.useCases.includes(uc.value)}
+                  onClick={() => toggleUseCase(uc.value)}
+                  className={chipClass(filters.useCases.includes(uc.value))}
+                >
+                  {uc.label}
+                </button>
+              ))}
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-semibold uppercase text-ink-muted">
+                  LRV: Light ← → Dark
+                </label>
+                <span className="text-xs font-medium text-ink">
+                  {filters.lrvMin}–{filters.lrvMax}
+                </span>
+              </div>
+              <div className="relative h-6 flex items-center">
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={filters.lrvMin}
+                  aria-label="Minimum LRV"
+                  onChange={(e) =>
+                    onChange({ ...filters, lrvMin: Math.min(Number(e.target.value), filters.lrvMax) })
+                  }
+                  className="dual-range absolute w-full"
+                />
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={filters.lrvMax}
+                  aria-label="Maximum LRV"
+                  onChange={(e) =>
+                    onChange({ ...filters, lrvMax: Math.max(Number(e.target.value), filters.lrvMin) })
+                  }
+                  className="dual-range absolute w-full"
+                />
+              </div>
+              <p className="text-xs text-ink-muted mt-1">
+                LRV (Light Reflectance Value) measures how much light a color reflects back — 0 is absolute black, 100 is pure white.
+              </p>
+            </div>
+
+            {jumpFamilies.length > 0 && (
+              <nav aria-label="Jump to color family" className="flex flex-wrap gap-x-3 gap-y-1 text-xs pt-1">
+                {jumpFamilies.map((family) => (
+                  <a key={family} href={`#${FAMILY_CODES[family]}`} className="text-brand-teal hover:underline">
+                    {family}
+                  </a>
+                ))}
+              </nav>
+            )}
+          </div>
         )}
       </div>
     </div>
