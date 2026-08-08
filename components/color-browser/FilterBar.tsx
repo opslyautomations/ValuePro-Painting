@@ -36,22 +36,17 @@ export default function FilterBar({
   // if the page loads already scrolled (e.g. an anchor link).
   const [collapsed, setCollapsed] = useState(false);
 
-  // Auto-collapse the chip/slider panel on any scroll movement so the color
-  // rails stay visible — never auto-expands, so a manual re-open sticks
-  // until the visitor scrolls again.
+  // Auto-collapse the chip/slider panel when the visitor actually scrolls,
+  // so the color rails stay visible — never auto-expands, so a manual
+  // re-open sticks until they scroll again. Listening for the scroll
+  // *gesture* (wheel/touch) rather than the resulting scrollTop matters:
+  // expanding the panel changes its own height, which can shift the
+  // in-flow layout enough to trigger a browser scroll-anchoring
+  // adjustment — a plain "scroll" listener would see that as "the user
+  // scrolled" and immediately re-collapse the panel that was just opened.
   useEffect(() => {
-    let lastY = window.scrollY;
-    let ticking = false;
-    function check() {
-      const y = window.scrollY;
-      if (Math.abs(y - lastY) > 8) setCollapsed(true);
-      lastY = y;
-      ticking = false;
-    }
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(check);
+    function collapse() {
+      setCollapsed(true);
     }
     // Deferred to a rAF (post-hydration) rather than checked synchronously
     // here, so a page that loads already scrolled (e.g. an anchor link)
@@ -59,8 +54,12 @@ export default function FilterBar({
     requestAnimationFrame(() => {
       if (window.scrollY > 8) setCollapsed(true);
     });
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("wheel", collapse, { passive: true });
+    window.addEventListener("touchmove", collapse, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", collapse);
+      window.removeEventListener("touchmove", collapse);
+    };
   }, []);
 
   function toggleBrand(brand: Brand) {
