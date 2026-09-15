@@ -136,6 +136,7 @@ export function aboutPageSchema() {
       employee: {
         "@type": "Person",
         name: BUSINESS.owner,
+        image: `${SITE_URL}/ryan-owner-valuepro-painting.jpg`,
       },
       areaServed: CITIES.map((c) => `${c.name}, MO`),
     },

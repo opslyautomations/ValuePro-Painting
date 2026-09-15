@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { pageMetadata } from "@/lib/seo";
 import { aboutPageSchema, breadcrumbSchema } from "@/lib/schema";
 import JsonLd from "@/components/JsonLd";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CTABand from "@/components/CTABand";
 import ClientFactNotice from "@/components/ClientFactNotice";
-import ImagePlaceholder from "@/components/ImagePlaceholder";
+import Reveal from "@/components/motion/Reveal";
+import ownerPhoto from "@/public/ryan-owner-valuepro-painting.jpg";
 import { BUSINESS } from "@/lib/constants";
 
 export const metadata: Metadata = pageMetadata({
@@ -28,14 +30,29 @@ export default function AboutPage() {
       <Breadcrumbs items={breadcrumbs} />
 
       <section className="mx-auto max-w-3xl px-4 sm:px-6 py-10">
-        <h1 className="font-heading text-3xl sm:text-4xl font-semibold text-brand-teal-dark">
-          About ValuePro Painting
-        </h1>
+        <Reveal direction="up">
+          <h1 className="font-heading text-3xl sm:text-4xl font-semibold text-brand-teal-dark">
+            About ValuePro Painting
+          </h1>
+        </Reveal>
 
-        <ImagePlaceholder
-          label="[CLIENT FACT REQUIRED — OWNER PHOTO: a real photo of Ryan, ideally on a job site]"
-          className="mt-6 aspect-video"
-        />
+        {/* Statically imported so Next derives the dimensions and a blur
+            placeholder; priority because it sits above the fold here. */}
+        <Reveal direction="scale" className="mt-6">
+          <figure className="max-w-xs">
+            <Image
+              src={ownerPhoto}
+              alt="Ryan, owner of ValuePro Painting in Ballwin, Missouri"
+              placeholder="blur"
+              priority
+              sizes="(min-width: 640px) 320px, 100vw"
+              className="rounded-xl shadow-md"
+            />
+            <figcaption className="mt-3 text-sm text-ink-muted">
+              Ryan, owner of ValuePro Painting.
+            </figcaption>
+          </figure>
+        </Reveal>
 
         <div className="mt-8 space-y-4 text-ink-muted leading-relaxed">
           <p>ValuePro Painting is Ryan&apos;s business, and it did not start with paint.</p>
