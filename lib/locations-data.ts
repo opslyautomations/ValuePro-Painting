@@ -20,7 +20,6 @@ export type LocationPageData = {
 };
 
 const COMMON_CLIENT_FACTS = [
-  "[CLIENT FACT REQUIRED — YEARS IN BUSINESS]",
   "[CLIENT FACT REQUIRED — WARRANTY TERMS]",
 ];
 

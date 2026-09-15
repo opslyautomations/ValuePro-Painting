@@ -4,12 +4,14 @@ import { breadcrumbSchema } from "@/lib/schema";
 import JsonLd from "@/components/JsonLd";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import QuoteForm from "@/components/QuoteForm";
+import BusinessHours from "@/components/BusinessHours";
+import Reveal from "@/components/motion/Reveal";
 import { BUSINESS, CITIES } from "@/lib/constants";
 
 export const metadata: Metadata = pageMetadata({
   title: "Contact ValuePro Painting | Free Estimate",
   description:
-    "Contact ValuePro Painting for a free written estimate in St. Louis County. Call, email, or send the form — estimates happen at your property.",
+    "Contact ValuePro Painting for a free written estimate in St. Louis County. Open Monday-Friday 8am-6pm and Saturday 8am-3pm. Estimates happen at your property.",
   path: "/contact",
 });
 
@@ -58,6 +60,10 @@ export default async function ContactPage({
           </div>
 
           <div className="mt-8">
+            <BusinessHours />
+          </div>
+
+          <div className="mt-8">
             <h2 className="font-heading text-lg font-semibold text-ink mb-2">
               Where we work
             </h2>
@@ -74,9 +80,12 @@ export default async function ContactPage({
           </div>
         </div>
 
-        <div className="flex justify-center lg:justify-end">
+        <Reveal
+          direction="right"
+          className="flex justify-center lg:justify-end"
+        >
           <QuoteForm defaultMessage={message} />
-        </div>
+        </Reveal>
       </section>
     </>
   );

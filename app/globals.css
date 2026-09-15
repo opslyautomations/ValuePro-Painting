@@ -90,3 +90,301 @@ h4 {
   box-shadow: 0 0 0 2px white, 0 1px 2px rgba(0, 0, 0, 0.3);
   cursor: pointer;
 }
+
+/* ---------------------------------------------------------------------------
+   Motion system
+   ---------------------------------------------------------------------------
+   Scroll reveals hide their content with CSS, which would strand the content
+   permanently if the JS that reveals it never runs. So the hiding rule is
+   scoped to html.motion-ready, a class set by a blocking inline script in the
+   layout <head>. No JS (or prefers-reduced-motion) means no class, which means
+   nothing is ever hidden.
+--------------------------------------------------------------------------- */
+
+.reveal {
+  will-change: opacity, transform;
+}
+
+html.motion-ready .reveal:not([data-revealed="true"]) {
+  opacity: 0;
+}
+
+html.motion-ready .reveal[data-reveal="up"]:not([data-revealed="true"]) {
+  transform: translateY(28px);
+}
+html.motion-ready .reveal[data-reveal="left"]:not([data-revealed="true"]) {
+  transform: translateX(-32px);
+}
+html.motion-ready .reveal[data-reveal="right"]:not([data-revealed="true"]) {
+  transform: translateX(32px);
+}
+html.motion-ready .reveal[data-reveal="scale"]:not([data-revealed="true"]) {
+  transform: scale(0.94);
+}
+
+/* The transition is present from first paint. Nothing animates on load
+   because no value changes then — it only arms the reveal that follows. */
+html.motion-ready .reveal {
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+html.motion-ready .reveal[data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* --- Keyframes ----------------------------------------------------------- */
+
+/* Clouds translate in user-space px because percentage transforms inside an
+   SVG resolve against the element's own bbox, not the viewBox — a 40-unit
+   cloud would barely move. The viewBox is 400 wide. */
+@keyframes vp-cloud-drift {
+  from {
+    transform: translateX(-90px);
+  }
+  to {
+    transform: translateX(480px);
+  }
+}
+
+@keyframes vp-sway {
+  0%,
+  100% {
+    transform: rotate(-1.1deg);
+  }
+  50% {
+    transform: rotate(1.1deg);
+  }
+}
+
+@keyframes vp-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Wipes the fresh-paint layer across the house, left to right. Uses
+   clip-path rather than an SVG clipPath transform because percentage
+   transforms inside SVG resolve inconsistently across browsers. */
+@keyframes vp-paint-sweep {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  55%,
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* The roller rides the leading edge of that wipe. Its wrapper spans the
+   whole scene with the roller pinned to the wrapper's right edge, so
+   translateX(-100% -> 0) walks it across in lockstep with the sweep. */
+@keyframes vp-roller-run {
+  0% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  55% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  72%,
+  100% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+@keyframes vp-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes vp-pulse-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  70%,
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes vp-slide-up-in {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Animation utilities ------------------------------------------------- */
+
+.vp-cloud {
+  animation: vp-cloud-drift linear infinite;
+}
+.vp-sway {
+  animation: vp-sway 6s ease-in-out infinite;
+  /* Without fill-box the origin resolves against the whole viewBox and the
+     foliage swings around the scene instead of pivoting on its trunk. */
+  transform-box: fill-box;
+  transform-origin: bottom center;
+}
+.vp-float {
+  animation: vp-float 7s ease-in-out infinite;
+}
+.vp-pulse-ring {
+  animation: vp-pulse-ring 2.4s ease-out infinite;
+}
+.vp-marquee-track {
+  animation: vp-marquee 42s linear infinite;
+}
+.vp-marquee:hover .vp-marquee-track {
+  animation-play-state: paused;
+}
+
+/* The paint-reveal layer only sweeps once the scene scrolls into view.
+   The clipped start state is scoped to .motion-ready so that without JS (or
+   with reduced motion) the freshly painted house simply renders in full
+   rather than being clipped away to nothing forever. */
+html.motion-ready .vp-paint-layer {
+  clip-path: inset(0 100% 0 0);
+}
+html.motion-ready [data-revealed="true"] .vp-paint-layer {
+  animation: vp-paint-sweep 2.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+/* The roller is hidden unless the sweep is actually running. */
+.vp-roller-track {
+  opacity: 0;
+}
+html.motion-ready [data-revealed="true"] .vp-roller-track {
+  animation: vp-roller-run 2.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+/* --- Interactive flourishes ---------------------------------------------- */
+
+.vp-lift {
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 320ms ease;
+}
+.vp-lift:hover {
+  transform: translateY(-6px);
+}
+
+.vp-arrow {
+  display: inline-block;
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .vp-arrow {
+  transform: translateX(6px);
+}
+
+/* Underline that grows from the left on hover. */
+.vp-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.vp-underline:hover,
+.group:hover .vp-underline {
+  background-size: 100% 2px;
+}
+
+.vp-sticky-bar {
+  animation: vp-slide-up-in 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --- Reduced motion ------------------------------------------------------
+   Everything above collapses to a static page. The reveal rules are already
+   inert because the inline script withholds .motion-ready, so only the
+   decorative loops need switching off here.
+-------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .vp-paint-layer {
+    clip-path: none;
+  }
+
+  .vp-roller-track {
+    display: none;
+  }
+}
+
+/* Room for the mobile action bar so it never covers the last footer line.
+   The bar measures ~65px tall, plus the device's bottom safe-area inset. */
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Invisible range input laid over the before/after comparison. It gives the
+   drag handle keyboard and screen-reader behaviour for free; the visible
+   handle is drawn separately and ignores pointer events. */
+.vp-compare {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: ew-resize;
+  margin: 0;
+}
+.vp-compare::-webkit-slider-runnable-track {
+  height: 100%;
+  background: transparent;
+}
+.vp-compare::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 2px;
+  height: 100%;
+  background: transparent;
+  cursor: ew-resize;
+}
+.vp-compare::-moz-range-track {
+  height: 100%;
+  background: transparent;
+}
+.vp-compare::-moz-range-thumb {
+  width: 2px;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  cursor: ew-resize;
+}
+.vp-compare:focus-visible {
+  outline: 3px solid var(--brand-teal);
+  outline-offset: 3px;
+}

@@ -10,6 +10,8 @@ export const BUSINESS = {
   baseCity: "Ballwin, Missouri",
   gbpUrl: "https://share.google/BOHhT4oORfpja1bKY",
   certification: "EPA Lead-Safe Certified (RRP)",
+  /** Client-confirmed: painters on the crew carry 15+ years of experience. */
+  experienceYears: 15,
 };
 
 export type ServiceSummary = {

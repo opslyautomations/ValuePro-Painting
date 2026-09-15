@@ -1,4 +1,5 @@
 import { BUSINESS, CITIES, SITE_NAME, SITE_URL } from "./constants";
+import { openingHoursSpecification } from "./hours";
 
 export function organizationSchema() {
   return {
@@ -34,6 +35,7 @@ export function localBusinessSchema(cityName: string) {
       "@type": "City",
       name: `${cityName}, MO`,
     },
+    openingHoursSpecification: openingHoursSpecification(),
   };
 }
 
@@ -49,6 +51,7 @@ export function homepageLocalBusinessSchema() {
       "@type": "City",
       name: `${c.name}, MO`,
     })),
+    openingHoursSpecification: openingHoursSpecification(),
   };
 }
 

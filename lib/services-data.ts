@@ -114,7 +114,6 @@ export const SERVICES_DATA: ServicePageData[] = [
       },
     ],
     clientFacts: [
-      "[CLIENT FACT REQUIRED — YEARS IN BUSINESS]",
       "[CLIENT FACT REQUIRED — WARRANTY TERMS]",
     ],
     faqs: [
@@ -275,7 +274,6 @@ export const SERVICES_DATA: ServicePageData[] = [
       },
     ],
     clientFacts: [
-      "[CLIENT FACT REQUIRED — YEARS IN BUSINESS]",
       "[CLIENT FACT REQUIRED — WARRANTY TERMS]",
     ],
     faqs: [
@@ -413,7 +411,6 @@ export const SERVICES_DATA: ServicePageData[] = [
       },
     ],
     clientFacts: [
-      "[CLIENT FACT REQUIRED — YEARS IN BUSINESS]",
       "[CLIENT FACT REQUIRED — WARRANTY TERMS]",
     ],
     faqs: [
@@ -553,7 +550,6 @@ export const SERVICES_DATA: ServicePageData[] = [
       },
     ],
     clientFacts: [
-      "[CLIENT FACT REQUIRED — YEARS IN BUSINESS]",
       "[CLIENT FACT REQUIRED — WARRANTY TERMS]",
       "[CLIENT FACT REQUIRED — CREW SIZE]",
       "[CLIENT FACT REQUIRED — INSURANCE COVERAGE LIMITS]",
@@ -690,7 +686,6 @@ export const SERVICES_DATA: ServicePageData[] = [
       },
     ],
     clientFacts: [
-      "[CLIENT FACT REQUIRED — YEARS IN BUSINESS]",
       "[CLIENT FACT REQUIRED — WARRANTY TERMS]",
       "[CLIENT FACT REQUIRED — CREW SIZE]",
       "[CLIENT FACT REQUIRED — HOA/COMMERCIAL REFERENCES]",
@@ -783,7 +778,6 @@ export const SERVICES_DATA: ServicePageData[] = [
       },
     ],
     clientFacts: [
-      "[CLIENT FACT REQUIRED — YEARS IN BUSINESS]",
       "[CLIENT FACT REQUIRED — WARRANTY TERMS]",
       "[CONTENT PENDING — remainder of Part 2 (Drywall Repair) was not delivered: texture-matching detail, process steps, FAQs, internal links, authority link, and CTA are missing. Do not publish this page live until that content is supplied and placed verbatim.]",
     ],

@@ -12,7 +12,7 @@ import { BUSINESS } from "@/lib/constants";
 export const metadata: Metadata = pageMetadata({
   title: "About ValuePro Painting | Ballwin, MO",
   description:
-    "Meet Ryan, owner of ValuePro Painting. Years in home services, now painting homes across St. Louis County — one client at a time. Get a free estimate.",
+    "Meet Ryan, owner of ValuePro Painting. Painters with 15+ years of experience, now working across St. Louis County — one client at a time. Get a free estimate.",
   path: "/about",
 });
 
@@ -51,6 +51,12 @@ export default function AboutPage() {
           <p>
             Painting was the natural next step, and it&apos;s now a full part
             of what ValuePro does. The standard came with it.
+          </p>
+          <p>
+            The painters doing the work carry more than{" "}
+            {BUSINESS.experienceYears} years of experience on the brush and the
+            sprayer — long enough to have seen how every surface in a St. Louis
+            County house fails, and what it takes to make the repair disappear.
           </p>
         </div>
       </section>
@@ -193,7 +199,7 @@ export default function AboutPage() {
       <section className="mx-auto max-w-3xl px-4 sm:px-6 py-6">
         <ClientFactNotice
           items={[
-            "[CLIENT FACT REQUIRED — YEARS IN HOME SERVICES]",
+            "[CLIENT FACT REQUIRED — YEAR VALUEPRO WAS FOUNDED]",
             "[CLIENT FACT REQUIRED — YEAR PAINTING WAS ADDED]",
             "[CLIENT FACT REQUIRED — WARRANTY TERMS]",
             "[CLIENT FACT REQUIRED — CREW SIZE]",
