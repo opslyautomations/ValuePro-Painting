@@ -388,3 +388,18 @@ html.motion-ready [data-revealed="true"] .vp-roller-track {
   outline: 3px solid var(--brand-teal);
   outline-offset: 3px;
 }
+
+/* Horizontal card tracks: keep the scrollbar out of the design but leave the
+   track scrollable by touch, trackpad and keyboard. */
+.vp-scroller {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.vp-scroller::-webkit-scrollbar {
+  display: none;
+}
+.vp-scroller:focus-visible {
+  outline: 3px solid var(--brand-teal);
+  outline-offset: 4px;
+  border-radius: 0.75rem;
+}

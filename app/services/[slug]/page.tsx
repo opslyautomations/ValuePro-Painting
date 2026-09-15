@@ -13,6 +13,14 @@ import CTABand from "@/components/CTABand";
 import ServicesGrid from "@/components/ServicesGrid";
 import ClientFactNotice from "@/components/ClientFactNotice";
 import LocalResources from "@/components/LocalResources";
+import Reveal from "@/components/motion/Reveal";
+import ServiceHero from "@/components/service/ServiceHero";
+import QuickFacts from "@/components/service/QuickFacts";
+import SectionNav, { type NavItem } from "@/components/service/SectionNav";
+import ServiceSectionBlock, {
+  isPullQuote,
+  sectionId,
+} from "@/components/service/ServiceSections";
 
 export function generateStaticParams() {
   return SERVICES_DATA.map((s) => ({ slug: s.slug }));
@@ -43,10 +51,21 @@ export default async function ServicePage({
   const service = serviceDataBySlug(slug);
   if (!service) notFound();
 
+  const summary = serviceBySlug(service.slug);
+
   const breadcrumbs = [
     { name: "Home", path: "/" },
     { name: "Services", path: "/services" },
     { name: service.name, path: `/services/${service.slug}` },
+  ];
+
+  // Pull quotes carry no heading, so they are not navigation targets.
+  const navItems: NavItem[] = [
+    { id: "overview", label: "Overview" },
+    ...service.sections
+      .filter((s) => !isPullQuote(s))
+      .map((s) => ({ id: sectionId(s.heading), label: s.heading })),
+    ...(service.faqs.length > 0 ? [{ id: "faqs", label: "FAQs" }] : []),
   ];
 
   return (
@@ -60,35 +79,47 @@ export default async function ServicePage({
       />
       <Breadcrumbs items={breadcrumbs} />
 
-      <section className="mx-auto max-w-3xl px-4 sm:px-6 py-10">
-        <h1 className="font-heading text-3xl sm:text-4xl font-semibold text-brand-teal-dark">
-          {service.h1}
-        </h1>
-        <div className="mt-6">
-          <Prose blocks={service.intro} />
+      <ServiceHero
+        slug={service.slug}
+        title={service.h1}
+        lede={summary?.line ?? service.metaDescription}
+      />
+
+      <QuickFacts />
+
+      <SectionNav items={navItems} />
+
+      <section id="overview" className="scroll-mt-40">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+          <Reveal direction="up">
+            <div className="max-w-3xl text-lg">
+              <Prose blocks={service.intro} />
+            </div>
+          </Reveal>
         </div>
       </section>
 
       {service.sections.map((section) => (
-        <section key={section.heading} className="mx-auto max-w-3xl px-4 sm:px-6 py-6">
-          <h2 className="font-heading text-2xl font-semibold text-brand-teal-dark mb-4">
-            {section.heading}
-          </h2>
-          <Prose blocks={section.blocks} />
-        </section>
+        <ServiceSectionBlock key={section.heading} section={section} />
       ))}
 
       {service.clientFacts.length > 0 && (
-        <section className="mx-auto max-w-3xl px-4 sm:px-6 py-6">
-          <ClientFactNotice items={service.clientFacts} />
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 py-6">
+          <div className="max-w-3xl">
+            <ClientFactNotice items={service.clientFacts} />
+          </div>
         </section>
       )}
 
       {service.faqs.length > 0 && (
-        <>
-          <FAQAccordion faqs={service.faqs} heading={`${service.name} FAQs`} />
+        <div id="faqs" className="scroll-mt-40 bg-white">
+          <FAQAccordion
+            faqs={service.faqs}
+            heading={`${service.name} FAQs`}
+            align="left"
+          />
           {service.authorityLink && (
-            <div className="mx-auto max-w-3xl px-4 sm:px-6 -mt-8 pb-10">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 -mt-8 pb-10">
               <LocalResources
                 resources={[
                   {
@@ -99,39 +130,43 @@ export default async function ServicePage({
               />
             </div>
           )}
-        </>
+        </div>
       )}
 
       {(service.relatedServices.length > 0 || service.relatedCities.length > 0) && (
-        <section className="mx-auto max-w-3xl px-4 sm:px-6 py-6">
-          <h2 className="font-heading text-xl font-semibold text-brand-teal-dark mb-3">
-            Related pages
-          </h2>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12">
+          <Reveal direction="up">
+            <h2 className="font-heading text-xl font-semibold text-brand-teal-dark mb-4">
+              Related pages
+            </h2>
+          </Reveal>
           <div className="flex flex-wrap gap-3 text-sm">
-            {service.relatedServices.map((s) => {
+            {service.relatedServices.map((s, i) => {
               const related = serviceBySlug(s);
               if (!related) return null;
               return (
-                <Link
-                  key={s}
-                  href={`/services/${s}`}
-                  className="rounded-full border border-brand-teal/30 px-4 py-2 font-medium text-brand-teal-dark hover:bg-brand-green-light/40"
-                >
-                  {related.name}
-                </Link>
+                <Reveal key={s} direction="scale" delay={i * 60}>
+                  <Link
+                    href={`/services/${s}`}
+                    className="tap-target inline-flex items-center rounded-full border border-brand-teal/30 bg-white px-4 py-2 font-medium text-brand-teal-dark transition-all hover:-translate-y-0.5 hover:border-brand-teal hover:shadow-md"
+                  >
+                    {related.name}
+                  </Link>
+                </Reveal>
               );
             })}
-            {service.relatedCities.map((c) => {
+            {service.relatedCities.map((c, i) => {
               const related = cityBySlug(c);
               if (!related) return null;
               return (
-                <Link
-                  key={c}
-                  href={`/locations/${c}`}
-                  className="rounded-full border border-brand-teal/30 px-4 py-2 font-medium text-brand-teal-dark hover:bg-brand-green-light/40"
-                >
-                  {related.name}, MO
-                </Link>
+                <Reveal key={c} direction="scale" delay={(i + 2) * 60}>
+                  <Link
+                    href={`/locations/${c}`}
+                    className="tap-target inline-flex items-center rounded-full border border-brand-teal/30 bg-white px-4 py-2 font-medium text-brand-teal-dark transition-all hover:-translate-y-0.5 hover:border-brand-teal hover:shadow-md"
+                  >
+                    {related.name}, MO
+                  </Link>
+                </Reveal>
               );
             })}
           </div>

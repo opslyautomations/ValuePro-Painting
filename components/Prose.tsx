@@ -10,7 +10,8 @@ function renderBold(text: string, keyBase: string): ReactNode[] {
 }
 
 // Renders a string containing [text](/path) links and **bold** markers.
-function renderInline(text: string): ReactNode[] {
+// Exported so the service-page cards render the same inline syntax.
+export function renderInline(text: string): ReactNode[] {
   const nodes: ReactNode[] = [];
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
   let lastIndex = 0;
